@@ -1,6 +1,6 @@
 Metadata-Version: 1.0
 Name: python-passfd
-Version: 0.1
+Version: 0.2
 Summary: Python functions to pass file descriptors across UNIX domain sockets
 Home-page: http://code.google.com/p/python-passfd/
 Author: Martin Ferrari

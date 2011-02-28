@@ -47,12 +47,23 @@ int _recvfd(int sock, size_t *len, void *buf);
 static PyObject *
 sendfd(PyObject *self, PyObject *args) {
     const char *message;
+    char *buf;
     int ret, sock, fd, message_len;
 
     if(!PyArg_ParseTuple(args, "iis#", &sock, &fd, &message, &message_len))
         return NULL;
 
+    /* I don't know if I need to make a copy of the message buffer for thread
+     * safety, but let's do it just in case... */
+    buf = strndup(message, (size_t)message_len);
+    if(buf == NULL)
+        return PyErr_SetFromErrno(PyExc_OSError);
+
+    Py_BEGIN_ALLOW_THREADS;
     ret = _sendfd(sock, fd, message_len, message);
+    Py_END_ALLOW_THREADS;
+
+    free(buf);
     if(ret == -1)
         return PyErr_SetFromErrno(PyExc_OSError);
     return Py_BuildValue("i", ret);
@@ -73,7 +84,11 @@ recvfd(PyObject *self, PyObject *args) {
         return PyErr_SetFromErrno(PyExc_OSError);
 
     _buffersize = buffersize;
+
+    Py_BEGIN_ALLOW_THREADS;
     ret = _recvfd(sock, &_buffersize, buffer);
+    Py_END_ALLOW_THREADS;
+
     buffersize = (int)_buffersize;
     if(ret == -1) {
         free(buffer);
@@ -85,32 +100,9 @@ recvfd(PyObject *self, PyObject *args) {
 }
 
 static PyMethodDef methods[] = {
-    {"sendfd", sendfd, METH_VARARGS, "rv = sendfd(sock, fd, message): "
-        "send a message and piggyback\n" "a file descriptor.\n\n"
-            "Note that the file descriptor cannot be sent by itself, at\n"
-            "least one byte of payload needs to be sent.\n\n"
-            "Parameters:\n"
-            " sock:    file descriptor for an AF_UNIX socket\n"
-            " fd:      file descriptor to pass\n"
-            " message: message to send\n\n"
-            "Return value:\n"
-            "On success, sendfd returns the number of characters from the\n"
-            "message sent, the file descriptor information is not taken into\n"
-            "account. If there was no message to send, 0 is returned. On \n"
-            "error, -1 is returned, and errno is set appropriately.\n" },
+    {"sendfd", sendfd, METH_VARARGS, "rv = sendfd(sock, fd, message)"},
     {"recvfd", recvfd, METH_VARARGS, "(fd, message) = recvfd(sock, "
-        "buffersize = 4096)" ": receive \n"
-            "a message and a file descriptor.\n\n"
-            "Parameters:\n"
-            " sock:       file descriptor for an AF_UNIX socket\n"
-            " buffersize: maximum message size to receive\n\n"
-            "Return value:\n"
-            "On success, recvfd returns a tuple containing the received\n"
-            "file descriptor and message. If recvmsg fails, an exception is\n"
-            "raised. If the received data does not carry exactly one file\n"
-            "descriptor, -2 is returned as the first element of the tuple.\n"
-            "If the received file descriptor is not valid, -3 is returned.\n"
-    },
+        "buffersize = 4096)"},
     {NULL, NULL, 0, NULL}
 };
 
@@ -153,6 +145,10 @@ int _sendfd(int sock, int fd, size_t len, const void *msg) {
     /* At least one byte needs to be sent, for some reason (?) */
     if(len < 1)
         return 0;
+
+    memset(&iov[0], 0, sizeof(struct iovec));
+    memset(&msgh, 0, sizeof(struct msghdr));
+    memset(buf, 0, CMSG_SIZE);
 
     msgh.msg_name       = NULL;
     msgh.msg_namelen    = 0;
