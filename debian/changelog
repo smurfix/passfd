@@ -1,0 +1,6 @@
+python-passfd (0.2-1) unstable; urgency=low
+
+  * Initial Debian packaging.
+
+ -- Matthias Urlichs <smurf@smurf.noris.de>  Mon, 29 Dec 2003 17:13:59 +0100
+

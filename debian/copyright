@@ -1,0 +1,11 @@
+This is python-passfd, a small Python library to pass file descriptors,
+written by Copyright © 2010 Martín Ferrari <martin.ferrari@gmail.com>
+
+It was packaged for Debian by Matthias Urlichs <smurf@smurf.noris.de>
+on Mon, 28 Feb 2011.
+
+The original source can be found at:
+    http://pypi.python.org/packages/source/p/python-passfd/
+
+This package is copyrighted by the GPL v2+ license.
+On Debian systems, it is available at /usr/share/common-licenses/GPL-2 .

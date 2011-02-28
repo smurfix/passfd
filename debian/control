@@ -1,0 +1,20 @@
+Source: python-passfd
+Section: python
+Priority: optional
+Maintainer: Matthias Urlichs <smurf@smurf.noris.de>
+Build-Depends-Indep: debhelper (>= 4.1), python, python-dev (>= 2.2)
+Standards-Version: 3.6.1
+XS-Python-Version: >= 2.3, << 3
+
+Package: python-passfd
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ${python:Depends}
+XB-Python-Version: ${python:Versions}
+Provides: ${python:Provides}
+Description: file descriptor passing for Python
+ This library implements sendfd() and recvfd(). These methods are
+ used to transmit file descriptors through Unix-domain sockets.
+ .
+ Underneath, they use the C sendmsg()/recvmsg() procedures, but
+ don't implement any other of their features.
+
