@@ -123,3 +123,6 @@ def recvfd(sock, msg_buf = 4096):
     assert ret >= 0
 
     return (ret, msg)
+
+socket.socket.sendfd = sendfd
+socket.socket.recvfd = recvfd
