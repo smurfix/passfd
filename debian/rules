@@ -22,6 +22,7 @@ build-stamp: $(PYVERS:%=build-python%)
 build-python%:
 	dh_testdir
 	python$* setup.py build
+	python$*-dbg setup.py build
 	touch $@
 
 install::
@@ -33,6 +34,7 @@ install::
 install:: build-stamp $(PYVERS:%=install-python%)
 install-python%:
 	python$* setup.py install --root $(CURDIR)/debian/python-passfd
+	python$*-dbg setup.py install --root $(CURDIR)/debian/python-passfd
 
 clean:
 	dh_testdir

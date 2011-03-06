@@ -1,3 +1,9 @@
+python-passfd (0.2-3) unstable; urgency=low
+
+  * Also build debug versions.
+
+ -- Matthias Urlichs <smurf@smurf.noris.de>  Sun, 06 Mar 2011 12:24:18 +0100
+
 python-passfd (0.2-2) unstable; urgency=low
 
   * Monkeypatch sendfd/recvfd methods onto the socket object.
